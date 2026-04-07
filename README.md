@@ -90,3 +90,20 @@ ctask review
 - 需要人工介入
 - 任務時間很長
 - 需要保留上下文 session
+
+## 建議權限設定
+
+對這類遠端互動工作，建議用偏寬鬆的權限組合：
+
+- sandbox: `danger-full-access`
+- approval policy: 越少詢問越好
+- network: 開放
+
+原因是這類工作通常會碰到：
+
+- `tmux` socket
+- `~/.bashrc`、`~/.config`、`~/.ssh`
+- GitHub、`gh`、套件安裝、遠端存取
+- 長時間執行中的 task session
+
+如果仍使用偏保守的模式，例如 `workspace-write` 搭配 restricted network，實際上常會被這些限制卡住。
