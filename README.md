@@ -64,30 +64,6 @@ Ctrl+b d
 ctask review
 ```
 
-## SSH 用法
-
-從本機直接登入後進指定 task：
-
-```bash
-ssh user@host -t 'export CODEX_CMD="codex"; ~/WorkSpace/codex-interactive-mode/scripts/codex-task.sh review'
-```
-
-如果你常用固定主機，可以加到本機 `~/.ssh/config`：
-
-```sshconfig
-Host codex-box
-  HostName your.server.example
-  User roger
-  RequestTTY yes
-  RemoteCommand export CODEX_CMD="codex"; ~/WorkSpace/codex-interactive-mode/scripts/codex-task.sh review
-```
-
-這樣之後只要：
-
-```bash
-ssh codex-box
-```
-
 ## 直接對應你的原始 tmux 指令
 
 你原本手打的是：
