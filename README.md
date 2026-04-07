@@ -43,7 +43,7 @@ source ~/.bashrc
 export CODEX_WORKDIR="$HOME/WorkSpace"
 export CODEX_SOCKET_DIR="/tmp/codex-tmux"
 export CODEX_SESSION_PREFIX="codex"
-export CODEX_CMD="codex"
+export CODEX_CMD="codex --full-auto"
 export PATH="$HOME/.local/bin:$PATH"
 
 alias ctask="$HOME/.local/bin/ctask"
@@ -61,7 +61,14 @@ export CODEX_CMD="chatgpt"
 export CODEX_CMD="your-wrapper-command"
 ```
 
-如果你是用 Codex CLI，也可以直接把 mode 寫進 `CODEX_CMD`：
+如果你是用 Codex CLI，建議直接把 mode 寫進 `CODEX_CMD`。
+預設建議：
+
+```bash
+export CODEX_CMD="codex --full-auto"
+```
+
+其他常用 mode：
 
 ```bash
 export CODEX_CMD="codex --suggest"
@@ -109,31 +116,11 @@ ctask review
 - 任務時間很長
 - 需要保留上下文 session
 
-## 建議權限設定
+## 常用 mode 說明
 
-對這類遠端互動工作，建議用偏寬鬆的權限組合：
-
-- sandbox: `danger-full-access`
-- approval policy: 越少詢問越好
-- network: 開放
-
-原因是這類工作通常會碰到：
-
-- `tmux` socket
-- `~/.bashrc`、`~/.config`、`~/.ssh`
-- GitHub、`gh`、套件安裝、遠端存取
-- 長時間執行中的 task session
-
-如果仍使用偏保守的模式，例如 `workspace-write` 搭配 restricted network，實際上常會被這些限制卡住。
-
-## Codex Mode 與權限的關係
-
-這兩層要分開看：
-
-- Codex mode：控制 agent 的自動化程度
-- sandbox / approval policy：控制這個 session 的實際權限邊界
-
-常用 mode：
+- `codex --full-auto`
+  - 預設建議
+  - 適合長任務、反覆改檔、反覆執行命令的工作
 
 - `codex --suggest`
   - 偏保守
@@ -145,9 +132,4 @@ ctask review
   - 可自動改檔與執行命令
   - 但仍受當前 sandbox 限制
 
-重點：
-
-- mode 不是 sandbox
-- `--full-auto` 不等於無限制權限
-- 想少被問，看 mode 與 approval policy
-- 想碰更多檔案、網路、系統資源，看 sandbox 與 network 設定
+不管用哪個 mode，實際能做多少事還是取決於當前 session 的 sandbox、approval policy 與 network 設定。
