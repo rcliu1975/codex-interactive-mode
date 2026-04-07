@@ -61,6 +61,24 @@ export CODEX_CMD="chatgpt"
 export CODEX_CMD="your-wrapper-command"
 ```
 
+如果你是用 Codex CLI，也可以直接把 mode 寫進 `CODEX_CMD`：
+
+```bash
+export CODEX_CMD="codex --suggest"
+```
+
+或：
+
+```bash
+export CODEX_CMD="codex --auto-edit"
+```
+
+或：
+
+```bash
+export CODEX_CMD="codex --full-auto"
+```
+
 ## 使用方式
 
 建立或回到同一個任務：
@@ -107,3 +125,29 @@ ctask review
 - 長時間執行中的 task session
 
 如果仍使用偏保守的模式，例如 `workspace-write` 搭配 restricted network，實際上常會被這些限制卡住。
+
+## Codex Mode 與權限的關係
+
+這兩層要分開看：
+
+- Codex mode：控制 agent 的自動化程度
+- sandbox / approval policy：控制這個 session 的實際權限邊界
+
+常用 mode：
+
+- `codex --suggest`
+  - 偏保守
+  - 改檔與執行命令都傾向先問
+- `codex --auto-edit`
+  - 可自動改檔
+  - 執行命令前通常仍會問
+- `codex --full-auto`
+  - 可自動改檔與執行命令
+  - 但仍受當前 sandbox 限制
+
+重點：
+
+- mode 不是 sandbox
+- `--full-auto` 不等於無限制權限
+- 想少被問，看 mode 與 approval policy
+- 想碰更多檔案、網路、系統資源，看 sandbox 與 network 設定
