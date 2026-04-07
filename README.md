@@ -11,16 +11,10 @@
 
 ## 腳本
 
-主腳本：
+唯一入口：
 
 ```bash
 ./scripts/codex-task.sh <task-name>
-```
-
-快速 attach：
-
-```bash
-./scripts/codex-attach.sh <task-name>
 ```
 
 ## 建議 alias
@@ -34,7 +28,6 @@ export CODEX_SESSION_PREFIX="codex"
 export CODEX_CMD="codex"
 
 alias ctask="$HOME/WorkSpace/codex-interactive-mode/scripts/codex-task.sh"
-alias cattach="$HOME/WorkSpace/codex-interactive-mode/scripts/codex-attach.sh"
 ```
 
 如果你的入口不是 `codex`，只要改 `CODEX_CMD`，例如：
@@ -65,10 +58,10 @@ detach 但不中斷：
 Ctrl+b d
 ```
 
-重新登入後直接回去：
+重新登入後直接回去，還是同一條：
 
 ```bash
-cattach review
+ctask review
 ```
 
 ## SSH 用法
