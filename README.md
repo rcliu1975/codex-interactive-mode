@@ -64,21 +64,6 @@ Ctrl+b d
 ctask review
 ```
 
-## 直接對應你的原始 tmux 指令
-
-你原本手打的是：
-
-```bash
-tmux -S /tmp/codex-review.sock new -s codex-review
-```
-
-現在主腳本會自動把它標準化成：
-
-```bash
-tmux -S /tmp/codex-tmux/review.sock new-session -d -s codex-review -c ~/WorkSpace "$CODEX_CMD"
-tmux -S /tmp/codex-tmux/review.sock attach -t codex-review
-```
-
 ## 適合的任務
 
 - 長任務
