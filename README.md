@@ -35,57 +35,6 @@ cd codex-interactive-mode
 source ~/.bashrc
 ```
 
-## 建議 alias
-
-如果你不想跑部署腳本，也可以手動加到 `~/.bashrc` 或 `~/.zshrc`：
-
-```bash
-export CODEX_WORKDIR="$HOME/WorkSpace"
-export CODEX_SOCKET_DIR="/tmp/codex-tmux"
-export CODEX_SESSION_PREFIX="codex"
-export CODEX_CMD="codex --full-auto"
-export PATH="$HOME/.local/bin:$PATH"
-
-alias ctask="$HOME/.local/bin/ctask"
-```
-
-如果你的入口不是 `codex`，只要改 `CODEX_CMD`，例如：
-
-```bash
-export CODEX_CMD="chatgpt"
-```
-
-或：
-
-```bash
-export CODEX_CMD="your-wrapper-command"
-```
-
-如果你是用 Codex CLI，建議直接把 mode 寫進 `CODEX_CMD`。
-預設建議：
-
-```bash
-export CODEX_CMD="codex --full-auto"
-```
-
-其他常用 mode：
-
-```bash
-export CODEX_CMD="codex --suggest"
-```
-
-或：
-
-```bash
-export CODEX_CMD="codex --auto-edit"
-```
-
-或：
-
-```bash
-export CODEX_CMD="codex --full-auto"
-```
-
 ## 使用方式
 
 建立或回到同一個任務：
@@ -121,6 +70,7 @@ ctask review
 - `codex --full-auto`
   - 預設建議
   - 適合長任務、反覆改檔、反覆執行命令的工作
+  - `CODEX_CMD` 建議設成 `export CODEX_CMD="codex --full-auto"`
 
 - `codex --suggest`
   - 偏保守
@@ -128,8 +78,8 @@ ctask review
 - `codex --auto-edit`
   - 可自動改檔
   - 執行命令前通常仍會問
-- `codex --full-auto`
-  - 可自動改檔與執行命令
-  - 但仍受當前 sandbox 限制
+  - 如果你想用它，`CODEX_CMD` 可設成 `export CODEX_CMD="codex --auto-edit"`
+
+如果你的入口不是 `codex`，直接改 `CODEX_CMD` 即可，例如 `chatgpt` 或你自己的 wrapper command。
 
 不管用哪個 mode，實際能做多少事還是取決於當前 session 的 sandbox、approval policy 與 network 設定。
