@@ -49,19 +49,10 @@ write_shell_block() {
 
   awk \
     -v block_start="$BLOCK_START" \
-    -v block_end="$BLOCK_END" \
-    -v path_line="$PATH_LINE" \
-    -v path_line_home="$PATH_LINE_HOME" \
-    -v source_line="$SOURCE_LINE" \
-    -v source_line_home="$SOURCE_LINE_HOME" \
-    -v alias_line="$ALIAS_LINE" \
-    -v alias_line_home="$ALIAS_LINE_HOME" '
+    -v block_end="$BLOCK_END" '
       $0 == block_start { in_block = 1; next }
       $0 == block_end { in_block = 0; next }
       in_block { next }
-      $0 == path_line || $0 == path_line_home { next }
-      $0 == source_line || $0 == source_line_home { next }
-      $0 == alias_line || $0 == alias_line_home { next }
       { print }
     ' "$file" > "$tmp_file"
 
@@ -105,9 +96,6 @@ BLOCK_END="# <<< codex-interactive-mode <<<"
 BLOCK_PATH_LINE="export PATH=\"$(home_expr "$TARGET_BIN_DIR"):\$PATH\""
 BLOCK_SOURCE_LINE="[ -f \"$(home_expr "$ENV_FILE")\" ] && source \"$(home_expr "$ENV_FILE")\""
 BLOCK_ALIAS_LINE="alias ctask=\"$(home_expr "$TARGET_BIN")\""
-PATH_LINE_HOME="$BLOCK_PATH_LINE"
-SOURCE_LINE_HOME="$BLOCK_SOURCE_LINE"
-ALIAS_LINE_HOME="$BLOCK_ALIAS_LINE"
 
 write_shell_block "$HOME/.bashrc"
 
