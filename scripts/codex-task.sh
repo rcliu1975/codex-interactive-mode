@@ -44,10 +44,10 @@ SESSION_NAME="${SESSION_PREFIX}-${TASK_NAME}"
 if ! tmux -S "$SOCKET_PATH" has-session -t "$SESSION_NAME" 2>/dev/null; then
   START_CMD="exec bash"
   if [[ -n "$CODEX_CMD" ]]; then
-    START_CMD="cd \"$WORKDIR\" && $CODEX_CMD"
+    START_CMD="exec $CODEX_CMD"
   fi
 
-  tmux -S "$SOCKET_PATH" new-session -d -s "$SESSION_NAME" -c "$WORKDIR" "$START_CMD"
+  tmux -S "$SOCKET_PATH" new-session -d -s "$SESSION_NAME" -c "$WORKDIR" bash -lc "$START_CMD"
 fi
 
 exec tmux -S "$SOCKET_PATH" attach -t "$SESSION_NAME"

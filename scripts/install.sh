@@ -9,6 +9,7 @@ INSTALL_BIN_DIR="${INSTALL_BIN_DIR:-$HOME/.local/bin}"
 INSTALL_CONFIG_DIR="${INSTALL_CONFIG_DIR:-$HOME/.config/codex-interactive-mode}"
 TARGET_BIN="$INSTALL_BIN_DIR/ctask"
 ENV_FILE="$INSTALL_CONFIG_DIR/env.sh"
+TARGET_BIN_DIR="$(dirname "$TARGET_BIN")"
 DEFAULT_WORKDIR="${CODEX_WORKDIR:-$HOME/WorkSpace}"
 DEFAULT_SOCKET_DIR="${CODEX_SOCKET_DIR:-/tmp/codex-tmux}"
 DEFAULT_SESSION_PREFIX="${CODEX_SESSION_PREFIX:-codex}"
@@ -52,18 +53,16 @@ fi
 mkdir -p "$INSTALL_BIN_DIR" "$INSTALL_CONFIG_DIR"
 install -m 0755 "$REPO_ROOT/scripts/codex-task.sh" "$TARGET_BIN"
 
-if [[ ! -f "$ENV_FILE" ]]; then
-  cat > "$ENV_FILE" <<EOF
+cat > "$ENV_FILE" <<EOF
 export CODEX_WORKDIR="${DEFAULT_WORKDIR}"
 export CODEX_SOCKET_DIR="${DEFAULT_SOCKET_DIR}"
 export CODEX_SESSION_PREFIX="${DEFAULT_SESSION_PREFIX}"
 export CODEX_CMD="${DEFAULT_CODEX_CMD}"
 EOF
-fi
 
 SOURCE_LINE="[ -f \"$ENV_FILE\" ] && source \"$ENV_FILE\""
-PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
-ALIAS_LINE='alias ctask="$HOME/.local/bin/ctask"'
+PATH_LINE="export PATH=\"$TARGET_BIN_DIR:\$PATH\""
+ALIAS_LINE="alias ctask=\"$TARGET_BIN\""
 
 ensure_line "$HOME/.bashrc" "$PATH_LINE"
 ensure_line "$HOME/.bashrc" "$SOURCE_LINE"

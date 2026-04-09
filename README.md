@@ -25,6 +25,8 @@
 
 它會把 `ctask` 安裝到 `~/.local/bin/ctask`，並把環境設定寫到 `~/.config/codex-interactive-mode/env.sh`。
 它也會自動把 `alias ctask="$HOME/.local/bin/ctask"` 加到 `~/.bashrc`，如果有 `~/.zshrc` 也會一起加。
+如果你用 `INSTALL_BIN_DIR` 或 `INSTALL_CONFIG_DIR` 自訂安裝位置，install script 也會同步更新 shell 設定與 alias 指向新路徑。
+重新執行 `./scripts/install.sh` 時，會用目前的環境變數覆寫 `env.sh`，方便你調整預設 workdir、socket 位置或啟動命令。
 
 ## 安裝
 
@@ -81,5 +83,6 @@ ctask review
   - 如果你想用它，`CODEX_CMD` 可設成 `export CODEX_CMD="codex --auto-edit"`
 
 如果你的入口不是 `codex`，直接改 `CODEX_CMD` 即可，例如 `chatgpt` 或你自己的 wrapper command。
+`CODEX_CMD` 會在 tmux session 內透過 `bash -lc` 執行，所以像 `codex --full-auto` 這類帶參數的指令可以直接使用。
 
 不管用哪個 mode，實際能做多少事還是取決於當前 session 的 sandbox、approval policy 與 network 設定。
