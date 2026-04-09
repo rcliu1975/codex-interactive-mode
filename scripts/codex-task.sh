@@ -12,6 +12,7 @@ usage() {
   cat <<'EOF'
 Usage:
   codex-task.sh <task-name>
+  codex-task.sh --list
 
 Environment:
   CODEX_WORKDIR         Working directory for the tmux session
@@ -22,12 +23,53 @@ Environment:
 Example:
   CODEX_CMD='codex' codex-task.sh review
   CODEX_CMD='opencode' codex-task.sh long-job
+  codex-task.sh --list
 EOF
+}
+
+list_tasks() {
+  local socket_path
+  local task_name
+  local session_name
+  local status
+
+  if [[ ! -d "$SOCKET_DIR" ]]; then
+    echo "No task socket directory: $SOCKET_DIR"
+    return 0
+  fi
+
+  shopt -s nullglob
+  local sockets=("$SOCKET_DIR"/*.sock)
+  shopt -u nullglob
+
+  if [[ ${#sockets[@]} -eq 0 ]]; then
+    echo "No tasks found in $SOCKET_DIR"
+    return 0
+  fi
+
+  printf '%-24s %-8s %-32s %s\n' "TASK" "STATUS" "SESSION" "SOCKET"
+
+  for socket_path in "${sockets[@]}"; do
+    task_name="$(basename "${socket_path%.sock}")"
+    session_name="${SESSION_PREFIX}-${task_name}"
+    status="stale"
+
+    if tmux -S "$socket_path" has-session -t "$session_name" 2>/dev/null; then
+      status="active"
+    fi
+
+    printf '%-24s %-8s %-32s %s\n' "$task_name" "$status" "$session_name" "$socket_path"
+  done
 }
 
 if [[ -z "$TASK_NAME" ]]; then
   usage
   exit 1
+fi
+
+if [[ "$TASK_NAME" == "-l" || "$TASK_NAME" == "--list" ]]; then
+  list_tasks
+  exit 0
 fi
 
 if [[ ! "$TASK_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then

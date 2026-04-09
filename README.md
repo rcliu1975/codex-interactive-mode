@@ -15,6 +15,7 @@
 
 ```bash
 ./scripts/codex-task.sh <task-name>
+./scripts/codex-task.sh --list
 ```
 
 部署腳本：
@@ -58,6 +59,14 @@ Ctrl+b d
 ```bash
 ctask review
 ```
+
+列出目前 task：
+
+```bash
+ctask --list
+```
+
+輸出會標示每個 task 對應的 tmux session 與 socket，`active` 代表 session 仍可 attach，`stale` 代表 socket 還在但 session 已不存在。
 
 ## 適合的任務
 
