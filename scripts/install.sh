@@ -30,14 +30,42 @@ Optional environment overrides:
 EOF
 }
 
-ensure_line() {
+home_expr() {
+  local value="$1"
+
+  if [[ "$value" == "$HOME"* ]]; then
+    printf '$HOME%s\n' "${value#$HOME}"
+  else
+    printf '%s\n' "$value"
+  fi
+}
+
+write_shell_block() {
   local file="$1"
-  local line="$2"
+  local tmp_file
 
   touch "$file"
-  if ! grep -Fqx "$line" "$file"; then
-    printf '\n%s\n' "$line" >> "$file"
-  fi
+  tmp_file="$(mktemp)"
+
+  awk \
+    -v block_start="$BLOCK_START" \
+    -v block_end="$BLOCK_END" '
+      $0 == block_start { in_block = 1; next }
+      $0 == block_end { in_block = 0; next }
+      in_block { next }
+      { print }
+    ' "$file" > "$tmp_file"
+
+  mv "$tmp_file" "$file"
+
+  cat >> "$file" <<EOF
+
+$BLOCK_START
+$BLOCK_PATH_LINE
+$BLOCK_SOURCE_LINE
+$BLOCK_ALIAS_LINE
+$BLOCK_END
+EOF
 }
 
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
@@ -63,15 +91,16 @@ EOF
 SOURCE_LINE="[ -f \"$ENV_FILE\" ] && source \"$ENV_FILE\""
 PATH_LINE="export PATH=\"$TARGET_BIN_DIR:\$PATH\""
 ALIAS_LINE="alias ctask=\"$TARGET_BIN\""
+BLOCK_START="# >>> codex-interactive-mode >>>"
+BLOCK_END="# <<< codex-interactive-mode <<<"
+BLOCK_PATH_LINE="export PATH=\"$(home_expr "$TARGET_BIN_DIR"):\$PATH\""
+BLOCK_SOURCE_LINE="[ -f \"$(home_expr "$ENV_FILE")\" ] && source \"$(home_expr "$ENV_FILE")\""
+BLOCK_ALIAS_LINE="alias ctask=\"$(home_expr "$TARGET_BIN")\""
 
-ensure_line "$HOME/.bashrc" "$PATH_LINE"
-ensure_line "$HOME/.bashrc" "$SOURCE_LINE"
-ensure_line "$HOME/.bashrc" "$ALIAS_LINE"
+write_shell_block "$HOME/.bashrc"
 
 if [[ -f "$HOME/.zshrc" ]]; then
-  ensure_line "$HOME/.zshrc" "$PATH_LINE"
-  ensure_line "$HOME/.zshrc" "$SOURCE_LINE"
-  ensure_line "$HOME/.zshrc" "$ALIAS_LINE"
+  write_shell_block "$HOME/.zshrc"
 fi
 
 cat <<EOF

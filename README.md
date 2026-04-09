@@ -32,7 +32,7 @@
 ## 安裝
 
 ```bash
-git clone https://github.com/rcliu1975-note/codex-interactive-mode.git
+git clone https://github.com/rcliu1975/codex-interactive-mode.git
 cd codex-interactive-mode
 ./scripts/install.sh
 source ~/.bashrc
