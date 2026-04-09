@@ -13,7 +13,6 @@ TARGET_BIN_DIR="$(dirname "$TARGET_BIN")"
 DEFAULT_WORKDIR="${CODEX_WORKDIR:-$HOME/WorkSpace}"
 DEFAULT_SOCKET_DIR="${CODEX_SOCKET_DIR:-/tmp/codex-tmux}"
 DEFAULT_SESSION_PREFIX="${CODEX_SESSION_PREFIX:-codex}"
-DEFAULT_CODEX_CMD="${CODEX_CMD:-codex}"
 
 usage() {
   cat <<EOF
@@ -68,6 +67,20 @@ $BLOCK_END
 EOF
 }
 
+resolve_default_codex_cmd() {
+  if [[ -n "${CODEX_CMD:-}" ]]; then
+    printf '%s\n' "$CODEX_CMD"
+    return 0
+  fi
+
+  if command -v codex >/dev/null 2>&1; then
+    printf '%s\n' "$(command -v codex)"
+    return 0
+  fi
+
+  printf 'codex\n'
+}
+
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   usage
   exit 0
@@ -77,6 +90,8 @@ if ! command -v tmux >/dev/null 2>&1; then
   echo "tmux is required but was not found in PATH." >&2
   exit 1
 fi
+
+DEFAULT_CODEX_CMD="$(resolve_default_codex_cmd)"
 
 mkdir -p "$INSTALL_BIN_DIR" "$INSTALL_CONFIG_DIR"
 install -m 0755 "$REPO_ROOT/scripts/codex-task.sh" "$TARGET_BIN"
