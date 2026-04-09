@@ -27,6 +27,13 @@ Example:
 EOF
 }
 
+session_exists() {
+  local socket_path="$1"
+  local session_name="$2"
+
+  tmux -S "$socket_path" has-session -t "$session_name" 2>/dev/null
+}
+
 list_tasks() {
   local socket_path
   local task_name
@@ -54,7 +61,7 @@ list_tasks() {
     session_name="${SESSION_PREFIX}-${task_name}"
     status="stale"
 
-    if tmux -S "$socket_path" has-session -t "$session_name" 2>/dev/null; then
+    if session_exists "$socket_path" "$session_name"; then
       status="active"
     fi
 
@@ -83,7 +90,11 @@ mkdir -p "$SOCKET_DIR"
 SOCKET_PATH="$SOCKET_DIR/${TASK_NAME}.sock"
 SESSION_NAME="${SESSION_PREFIX}-${TASK_NAME}"
 
-if ! tmux -S "$SOCKET_PATH" has-session -t "$SESSION_NAME" 2>/dev/null; then
+if [[ -S "$SOCKET_PATH" ]] && ! session_exists "$SOCKET_PATH" "$SESSION_NAME"; then
+  rm -f "$SOCKET_PATH"
+fi
+
+if ! session_exists "$SOCKET_PATH" "$SESSION_NAME"; then
   START_CMD="exec bash"
   if [[ -n "$CODEX_CMD" ]]; then
     START_CMD="exec $CODEX_CMD"

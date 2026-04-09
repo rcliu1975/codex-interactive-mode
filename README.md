@@ -67,6 +67,7 @@ ctask --list
 ```
 
 輸出會標示每個 task 對應的 tmux session 與 socket，`active` 代表 session 仍可 attach，`stale` 代表 socket 還在但 session 已不存在。
+如果你直接執行 `ctask <task-name>` 遇到 stale socket，script 會先刪掉失效的 socket，再自動重建新的 tmux session。
 
 ## 適合的任務
 
