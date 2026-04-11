@@ -86,6 +86,7 @@ if [[ ! "$TASK_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then
 fi
 
 mkdir -p "$SOCKET_DIR"
+chmod 700 "$SOCKET_DIR"
 
 SOCKET_PATH="$SOCKET_DIR/${TASK_NAME}.sock"
 SESSION_NAME="${SESSION_PREFIX}-${TASK_NAME}"
