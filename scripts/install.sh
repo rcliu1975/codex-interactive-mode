@@ -29,6 +29,10 @@ Optional environment overrides:
 EOF
 }
 
+shell_escape() {
+  printf '%q' "$1"
+}
+
 home_expr() {
   local value="$1"
 
@@ -37,6 +41,23 @@ home_expr() {
   else
     printf '%s\n' "$value"
   fi
+}
+
+write_env_file() {
+  local tmp_file
+
+  tmp_file="$(mktemp "$INSTALL_CONFIG_DIR/env.sh.XXXXXX")"
+  chmod 600 "$tmp_file"
+
+  {
+    printf 'export CODEX_WORKDIR=%s\n' "$(shell_escape "$DEFAULT_WORKDIR")"
+    printf 'export CODEX_SOCKET_DIR=%s\n' "$(shell_escape "$DEFAULT_SOCKET_DIR")"
+    printf 'export CODEX_SESSION_PREFIX=%s\n' "$(shell_escape "$DEFAULT_SESSION_PREFIX")"
+    printf 'export CODEX_CMD=%s\n' "$(shell_escape "$DEFAULT_CODEX_CMD")"
+  } > "$tmp_file"
+
+  mv "$tmp_file" "$ENV_FILE"
+  chmod 600 "$ENV_FILE"
 }
 
 write_shell_block() {
@@ -94,14 +115,9 @@ fi
 DEFAULT_CODEX_CMD="$(resolve_default_codex_cmd)"
 
 mkdir -p "$INSTALL_BIN_DIR" "$INSTALL_CONFIG_DIR"
+chmod 700 "$INSTALL_CONFIG_DIR"
 install -m 0755 "$REPO_ROOT/scripts/codex-task.sh" "$TARGET_BIN"
-
-cat > "$ENV_FILE" <<EOF
-export CODEX_WORKDIR="${DEFAULT_WORKDIR}"
-export CODEX_SOCKET_DIR="${DEFAULT_SOCKET_DIR}"
-export CODEX_SESSION_PREFIX="${DEFAULT_SESSION_PREFIX}"
-export CODEX_CMD="${DEFAULT_CODEX_CMD}"
-EOF
+write_env_file
 
 SOURCE_LINE="[ -f \"$ENV_FILE\" ] && source \"$ENV_FILE\""
 PATH_LINE="export PATH=\"$TARGET_BIN_DIR:\$PATH\""

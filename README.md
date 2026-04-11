@@ -29,6 +29,7 @@
 如果你用 `INSTALL_BIN_DIR` 或 `INSTALL_CONFIG_DIR` 自訂安裝位置，install script 也會同步更新 shell 設定與 alias 指向新路徑。
 重新執行 `./scripts/install.sh` 時，會用目前的環境變數覆寫 `env.sh`，方便你調整預設 workdir、socket 位置或啟動命令。
 如果你沒有手動指定 `CODEX_CMD`，install script 會優先把 `command -v codex` 解析到的絕對路徑寫進 `env.sh`，避免 `nvm` 或 login shell 的 PATH 差異讓 tmux 內找不到 `codex`。
+`env.sh` 會用 shell-safe escaping 寫入，避免 `CODEX_CMD` 或路徑值在 shell 啟動時被意外展開執行；預設權限也會收緊為只有目前使用者可讀寫。
 
 ## 安裝
 
@@ -69,6 +70,7 @@ ctask --list
 
 輸出會標示每個 task 對應的 tmux session 與 socket，`active` 代表 session 仍可 attach，`stale` 代表 socket 還在但 session 已不存在。
 如果你直接執行 `ctask <task-name>` 遇到 stale socket，script 會先刪掉失效的 socket，再自動重建新的 tmux session。
+預設 socket 目錄建立後會收緊為 `700`，避免其他本機使用者列出 task 名稱或 socket 路徑。
 
 ## 適合的任務
 
