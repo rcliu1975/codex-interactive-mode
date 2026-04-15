@@ -27,6 +27,34 @@ Example:
 EOF
 }
 
+build_start_cmd() {
+  local codex_executable=""
+
+  if [[ -z "$CODEX_CMD" ]]; then
+    printf 'exec bash\n'
+    return 0
+  fi
+
+  codex_executable="${CODEX_CMD%% *}"
+
+  if [[ "$codex_executable" == /* ]]; then
+    printf 'export PATH=%q:"$PATH"\n' "$(dirname "$codex_executable")"
+  fi
+
+  cat <<'EOF'
+eval "$CODEX_CMD"
+status=$?
+
+if [[ $status -ne 0 ]]; then
+  printf '\nctask: startup command failed with exit status %s\n' "$status" >&2
+  printf 'ctask: CODEX_CMD=%q\n' "$CODEX_CMD" >&2
+  printf 'ctask: CODEX_WORKDIR=%q\n' "$CODEX_WORKDIR" >&2
+  printf 'ctask: dropping into an interactive shell for debugging.\n' >&2
+  exec bash
+fi
+EOF
+}
+
 session_exists() {
   local socket_path="$1"
   local session_name="$2"
@@ -85,6 +113,11 @@ if [[ ! "$TASK_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then
   exit 1
 fi
 
+if [[ ! -d "$WORKDIR" ]]; then
+  echo "CODEX_WORKDIR does not exist or is not a directory: $WORKDIR" >&2
+  exit 1
+fi
+
 mkdir -p "$SOCKET_DIR"
 chmod 700 "$SOCKET_DIR"
 
@@ -96,10 +129,7 @@ if [[ -S "$SOCKET_PATH" ]] && ! session_exists "$SOCKET_PATH" "$SESSION_NAME"; t
 fi
 
 if ! session_exists "$SOCKET_PATH" "$SESSION_NAME"; then
-  START_CMD="exec bash"
-  if [[ -n "$CODEX_CMD" ]]; then
-    START_CMD="exec $CODEX_CMD"
-  fi
+  START_CMD="$(build_start_cmd)"
 
   tmux -S "$SOCKET_PATH" new-session -d -s "$SESSION_NAME" -c "$WORKDIR" bash -lc "$START_CMD"
 fi
