@@ -30,7 +30,7 @@
 重新執行 `./scripts/install.sh` 時，會用目前的環境變數覆寫 `env.sh`，方便你調整預設 workdir、socket 位置或啟動命令。
 如果你沒有手動指定 `CODEX_CMD`，install script 會優先把 `command -v codex` 解析到的絕對路徑寫進 `env.sh`，避免 `nvm` 或 login shell 的 PATH 差異讓 tmux 內找不到 `codex`。
 如果 `CODEX_CMD` 是絕對路徑，`ctask` 啟動時也會先把該執行檔所在目錄加進 `PATH`，避免像 `#!/usr/bin/env node` 這類 shebang 在 tmux 內找不到同目錄的 runtime。
-`env.sh` 會用 shell-safe escaping 寫入，避免 `CODEX_CMD` 或路徑值在 shell 啟動時被意外展開執行；預設權限也會收緊為只有目前使用者可讀寫。
+`env.sh` 與寫入 shell init 的 block 都會用 shell-safe escaping 處理，避免 `CODEX_CMD` 或安裝路徑值在 shell 啟動時被意外展開執行；預設權限也會收緊為只有目前使用者可讀寫。
 
 ## 安裝
 
@@ -50,6 +50,12 @@ ctask review
 ctask approval-flow
 ctask long-job
 ```
+
+task name 限制如下：
+
+- 僅允許小寫英文字母與 `-`
+- `-` 不能在開頭或結尾
+- 若 task name 是 `danger` 或以 `danger-` 開頭，會強制用 `codex --dangerously-bypass-approvals-and-sandbox` 啟動，忽略一般 `CODEX_CMD`
 
 detach 但不中斷：
 

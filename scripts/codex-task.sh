@@ -23,12 +23,18 @@ Environment:
 Example:
   CODEX_CMD='codex' codex-task.sh review
   CODEX_CMD='opencode' codex-task.sh long-job
+  codex-task.sh danger-maintenance
   codex-task.sh --list
 EOF
 }
 
 build_start_cmd() {
   local codex_executable=""
+
+  if [[ "$TASK_NAME" == "danger" || "$TASK_NAME" == danger-* ]]; then
+    printf 'exec codex --dangerously-bypass-approvals-and-sandbox\n'
+    return 0
+  fi
 
   if [[ -z "$CODEX_CMD" ]]; then
     printf 'exec bash\n'
@@ -107,9 +113,9 @@ if [[ "$TASK_NAME" == "-l" || "$TASK_NAME" == "--list" ]]; then
   exit 0
 fi
 
-if [[ ! "$TASK_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+if [[ ! "$TASK_NAME" =~ ^[a-z]+(-[a-z]+)*$ ]]; then
   echo "Invalid task name: $TASK_NAME" >&2
-  echo "Allowed characters: a-z A-Z 0-9 . _ -" >&2
+  echo "Allowed format: lowercase letters and '-' only; '-' cannot be the first or last character." >&2
   exit 1
 fi
 
